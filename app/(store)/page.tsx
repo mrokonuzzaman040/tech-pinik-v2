@@ -4,6 +4,7 @@ import { getSliders } from "@/lib/collections/sliders";
 import { getFeaturedProducts } from "@/lib/collections/products";
 import { getCategories } from "@/lib/collections/categories";
 import { Button } from "@/components/ui/button";
+import { HeroCarousel } from "@/components/store/hero-carousel";
 import { ArrowRight, Truck, Shield } from "lucide-react";
 
 export default async function HomePage() {
@@ -13,63 +14,40 @@ export default async function HomePage() {
     getCategories(),
   ]);
   const activeSliders = sliders.filter((s) => s.active);
+  const heroSlides = activeSliders.map((s) => ({
+    title: s.title,
+    image: s.image,
+    link: s.link,
+  }));
 
   return (
     <div className="min-h-screen">
-      {/* Hero / Slider */}
-      <section className="relative w-full overflow-hidden bg-linear-to-br from-emerald-950 via-emerald-900 to-teal-900">
-        {activeSliders.length > 0 ? (
-          <div className="relative aspect-21/9 min-h-[280px] w-full md:aspect-3/1 md:min-h-[320px]">
-            {activeSliders[0].link ? (
-              <Link href={activeSliders[0].link} className="block h-full w-full">
-                <Image
-                  src={activeSliders[0].image}
-                  alt={activeSliders[0].title}
-                  fill
-                  className="object-cover object-center"
-                  priority
-                  unoptimized
-                  sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-black/20 transition-opacity hover:bg-black/10" />
-              </Link>
-            ) : (
-              <>
-                <Image
-                  src={activeSliders[0].image}
-                  alt={activeSliders[0].title}
-                  fill
-                  className="object-cover object-center"
-                  priority
-                  unoptimized
-                  sizes="100vw"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent" />
-              </>
-            )}
-          </div>
-        ) : (
+      {/* Hero: carousel when sliders exist, else fallback with theme colors */}
+      {heroSlides.length > 0 ? (
+        <HeroCarousel sliders={heroSlides} />
+      ) : (
+        <section className="relative w-full overflow-hidden bg-primary">
           <div className="container relative px-4 py-20 md:py-28">
             <div className="mx-auto max-w-2xl text-center">
-              <h1 className="text-4xl font-bold tracking-tight text-white drop-shadow-sm md:text-5xl">
+              <h1 className="text-4xl font-bold tracking-tight text-primary-foreground drop-shadow-sm md:text-5xl">
                 Welcome to Tech Pinik
               </h1>
-              <p className="mt-4 text-lg text-emerald-100/90">
-                Bangladesh&apos;s trusted e-commerce — shop with confidence. 
+              <p className="mt-4 text-lg text-primary-foreground/90">
+                Bangladesh&apos;s trusted e-commerce — shop with confidence.
                 Fast delivery across Dhaka and nationwide.
               </p>
               <div className="mt-8 flex flex-wrap justify-center gap-4">
-                <Button asChild size="lg" className="bg-white text-emerald-900 hover:bg-emerald-50">
+                <Button asChild size="lg" variant="secondary" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                   <Link href="/products">Shop now</Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10">
+                <Button asChild size="lg" variant="outline" className="border-primary-foreground/40 text-primary-foreground hover:bg-primary-foreground/10">
                   <Link href="/products">Browse products</Link>
                 </Button>
               </div>
             </div>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {/* Trust strip */}
       <section className="border-b bg-muted/50">

@@ -23,6 +23,8 @@ Bangladesh-focused e-commerce app built with Next.js (App Router), Better Auth, 
 
 3. Run the app and sign in at `/admin/login`.
 
+4. **Seed sample data** (optional): With `MONGODB_URI` set in `.env.local`, run `npm run seed` to insert sample categories, products, and sliders. The script is idempotent: it skips if the database already has data.
+
 ## Getting Started
 
 First, run the development server:
