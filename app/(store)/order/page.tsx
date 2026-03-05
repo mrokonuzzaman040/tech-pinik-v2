@@ -10,8 +10,8 @@ export default async function OrderPage() {
   }));
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
-      <h1 className="mb-6 text-2xl font-semibold">Place order</h1>
+    <div className="container mx-auto max-w-2xl px-4 py-12">
+      <h1 className="mb-6 text-2xl font-semibold">Checkout</h1>
       <p className="mb-6 text-muted-foreground">
         No account needed. Fill in your details and choose delivery zone.
       </p>

@@ -26,6 +26,15 @@ export async function getProducts(): Promise<Product[]> {
   return list;
 }
 
+export async function getFeaturedProducts(): Promise<Product[]> {
+  const list = await db
+    .collection<Product>(COLLECTION)
+    .find({ featured: true })
+    .sort({ order: 1, createdAt: -1 })
+    .toArray();
+  return list;
+}
+
 export async function getProductById(id: string): Promise<Product | null> {
   if (!ObjectId.isValid(id)) return null;
   const doc = await db

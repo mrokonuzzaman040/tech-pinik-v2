@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useCart } from "@/contexts/cart-context";
+
 type ProductOption = { id: string; name: string; price: number };
 
 const DELIVERY_OPTIONS = [
@@ -13,27 +16,41 @@ const DELIVERY_OPTIONS = [
   { value: "outside_dhaka", label: "Outside Dhaka — ৳110", charge: 110 },
 ] as const;
 
-export function OrderForm({
-  products,
-}: {
-  products: ProductOption[];
-}) {
+export function OrderForm({ products }: { products: ProductOption[] }) {
   const router = useRouter();
+  const { items: cartItems, clearCart } = useCart();
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [note, setNote] = useState("");
-  const [deliveryZone, setDeliveryZone] = useState<"inside_dhaka" | "outside_dhaka">("inside_dhaka");
-  const [items, setItems] = useState<Array<{ productId: string; quantity: number }>>([
-    { productId: "", quantity: 1 },
-  ]);
+  const [deliveryZone, setDeliveryZone] = useState<
+    "inside_dhaka" | "outside_dhaka"
+  >("inside_dhaka");
+  const [items, setItems] = useState<
+    Array<{ productId: string; quantity: number }>
+  >([{ productId: "", quantity: 1 }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      setItems(
+        cartItems.map((c) => ({
+          productId: c.productId,
+          quantity: c.quantity,
+        }))
+      );
+    }
+  }, [cartItems]);
 
   function addLine() {
     setItems((prev) => [...prev, { productId: "", quantity: 1 }]);
   }
 
-  function updateLine(index: number, field: "productId" | "quantity", value: string | number) {
+  function updateLine(
+    index: number,
+    field: "productId" | "quantity",
+    value: string | number
+  ) {
     setItems((prev) =>
       prev.map((line, i) =>
         i === index ? { ...line, [field]: value } : line
@@ -77,7 +94,10 @@ export function OrderForm({
         setError(data.error ?? "Failed to place order");
         return;
       }
-      alert(`Order placed. Invoice: ${data.invoiceId ?? data.orderId}. Total: ৳${data.total}`);
+      clearCart();
+      alert(
+        `Order placed. Invoice: ${data.invoiceId ?? data.orderId}. Total: ৳${data.total}`
+      );
       router.push("/");
       router.refresh();
     } finally {
@@ -121,7 +141,9 @@ export function OrderForm({
         <Label>Delivery *</Label>
         <select
           value={deliveryZone}
-          onChange={(e) => setDeliveryZone(e.target.value as "inside_dhaka" | "outside_dhaka")}
+          onChange={(e) =>
+            setDeliveryZone(e.target.value as "inside_dhaka" | "outside_dhaka")
+          }
           className="w-full rounded-md border border-input bg-background px-3 py-2"
         >
           {DELIVERY_OPTIONS.map((opt) => (
@@ -171,9 +193,14 @@ export function OrderForm({
         </Button>
       </div>
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <Button type="submit" disabled={loading} className="w-full">
-        {loading ? "Placing order…" : "Place order"}
-      </Button>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={loading} className="flex-1">
+          {loading ? "Placing order…" : "Place order"}
+        </Button>
+        <Button type="button" variant="outline" asChild>
+          <Link href="/products">Continue shopping</Link>
+        </Button>
+      </div>
     </form>
   );
 }
