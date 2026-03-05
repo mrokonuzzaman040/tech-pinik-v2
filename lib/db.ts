@@ -1,9 +1,10 @@
 import { MongoClient, Db } from "mongodb";
 
-const uri = process.env.MONGODB_URI;
-if (!uri) {
+const _uri = process.env.MONGODB_URI;
+if (!_uri) {
   throw new Error("MONGODB_URI is not set");
 }
+const uri: string = _uri;
 
 declare global {
   // eslint-disable-next-line no-var

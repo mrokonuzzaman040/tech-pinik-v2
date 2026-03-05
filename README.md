@@ -1,4 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tech Pinik
+
+Bangladesh-focused e-commerce app built with Next.js (App Router), Better Auth, shadcn/ui, MongoDB, and ImageKit.
+
+## Features
+
+- **Admin panel** (secure, role-based): CRUD for Products, Categories, Sliders, and Orders
+- **Guest orders**: Place order without account; phone, address, note, delivery zone (Inside Dhaka ৳65 / Outside Dhaka ৳110)
+- **Invoice**: Printable invoice in admin order detail
+- **Image uploads**: ImageKit for product, category, and slider images
+
+## Setup
+
+1. Copy `.env.local.example` to `.env.local` and set:
+   - `BETTER_AUTH_SECRET` (min 32 chars; e.g. `npx auth secret`)
+   - `BETTER_AUTH_URL` (e.g. `http://localhost:3000`)
+   - `MONGODB_URI`
+   - `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT`
+
+2. Create the first admin user (one-time):
+   - Set `BOOTSTRAP_ADMIN_SECRET`, then `POST /api/bootstrap-admin` with body: `{ "secret": "<same>", "email": "admin@example.com", "password": "your-password" }`
+   - Or call the API and then remove `BOOTSTRAP_ADMIN_SECRET` from env
+
+3. Run the app and sign in at `/admin/login`.
 
 ## Getting Started
 
