@@ -40,6 +40,8 @@ export default async function AdminProductsPage() {
             <TableRow>
               <TableHead className="w-16">Image</TableHead>
               <TableHead>Name</TableHead>
+              <TableHead>SKU</TableHead>
+              <TableHead>Brand</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Price (BDT)</TableHead>
               <TableHead>Stock</TableHead>
@@ -49,7 +51,7 @@ export default async function AdminProductsPage() {
           <TableBody>
             {products.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   No products yet.
                 </TableCell>
               </TableRow>
@@ -72,6 +74,8 @@ export default async function AdminProductsPage() {
                     )}
                   </TableCell>
                   <TableCell className="font-medium">{p.name}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{p.sku ?? "—"}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">{p.brand ?? "—"}</TableCell>
                   <TableCell>{categoryMap.get(p.categoryId) ?? p.categoryId}</TableCell>
                   <TableCell>৳{p.price.toLocaleString()}</TableCell>
                   <TableCell>{p.stock}</TableCell>

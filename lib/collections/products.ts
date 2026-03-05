@@ -1,6 +1,8 @@
 import { ObjectId } from "mongodb";
 import { db } from "@/lib/db";
 
+export type ProductSpec = { key: string; value: string };
+
 export type Product = {
   _id: ObjectId;
   name: string;
@@ -13,6 +15,15 @@ export type Product = {
   featured?: boolean;
   order?: number;
   createdAt: Date;
+  /** Stock Keeping Unit */
+  sku?: string;
+  brand?: string;
+  model?: string;
+  warranty?: string;
+  color?: string;
+  compatibility?: string;
+  connectivity?: string;
+  specifications?: ProductSpec[];
 };
 
 const COLLECTION = "products";
@@ -60,6 +71,14 @@ export async function createProduct(data: {
   stock: number;
   featured?: boolean;
   order?: number;
+  sku?: string;
+  brand?: string;
+  model?: string;
+  warranty?: string;
+  color?: string;
+  compatibility?: string;
+  connectivity?: string;
+  specifications?: ProductSpec[];
 }): Promise<Product> {
   const now = new Date();
   const result = await db.collection<Product>(COLLECTION).insertOne({

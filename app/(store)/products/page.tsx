@@ -4,24 +4,38 @@ import { getProducts } from "@/lib/collections/products";
 import { getCategories } from "@/lib/collections/categories";
 import { Card, CardContent } from "@/components/ui/card";
 import { PackageOpen } from "lucide-react";
+import { ProductsFilters } from "./products-filters";
 
 export default async function ProductsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string }>;
+  searchParams: Promise<{ category?: string; brand?: string; q?: string }>;
 }) {
   const [products, categories] = await Promise.all([
     getProducts(),
     getCategories(),
   ]);
-  const { category: categorySlug } = await searchParams;
-  const filtered =
-    categorySlug && categorySlug.trim()
-      ? products.filter((p) => {
-          const cat = categories.find((c) => c.slug === categorySlug.trim());
-          return cat && p.categoryId === cat._id.toString();
-        })
-      : products;
+  const { category: categorySlug, brand: brandFilter, q: searchQuery } = await searchParams;
+  const brands = [...new Set(products.map((p) => p.brand).filter(Boolean))] as string[];
+
+  let filtered = products;
+  if (categorySlug?.trim()) {
+    const cat = categories.find((c) => c.slug === categorySlug.trim());
+    if (cat) filtered = filtered.filter((p) => p.categoryId === cat._id.toString());
+  }
+  if (brandFilter?.trim()) {
+    filtered = filtered.filter((p) => p.brand === brandFilter.trim());
+  }
+  if (searchQuery?.trim()) {
+    const q = searchQuery.trim().toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        (p.sku && p.sku.toLowerCase().includes(q)) ||
+        (p.brand && p.brand.toLowerCase().includes(q)) ||
+        (p.model && p.model.toLowerCase().includes(q))
+    );
+  }
 
   return (
     <div className="container px-4 py-12 md:py-16">
@@ -37,35 +51,13 @@ export default async function ProductsPage({
         </p>
       </div>
 
-      {categories.length > 0 && (
-        <div className="mb-10 overflow-x-auto pb-2">
-          <div className="flex min-w-0 gap-2">
-            <Link
-              href="/products"
-              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                !categorySlug
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-background hover:bg-accent hover:text-accent-foreground"
-              }`}
-            >
-              All
-            </Link>
-            {categories.map((c) => (
-              <Link
-                key={c._id.toString()}
-                href={`/products?category=${encodeURIComponent(c.slug)}`}
-                className={`shrink-0 rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                  categorySlug === c.slug
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background hover:bg-accent hover:text-accent-foreground"
-                }`}
-              >
-                {c.name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
+      <ProductsFilters
+        categories={categories}
+        categorySlug={categorySlug ?? undefined}
+        brands={brands}
+        brandFilter={brandFilter ?? undefined}
+        searchQuery={searchQuery ?? undefined}
+      />
 
       {filtered.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-muted/30 py-16 text-center">
@@ -113,9 +105,17 @@ export default async function ProductsPage({
                   </span>
                 </div>
                 <CardContent className="p-4">
-                  <p className="font-semibold leading-snug line-clamp-2 group-hover:text-primary">
+                  {p.brand && (
+                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      {p.brand}
+                    </p>
+                  )}
+                  <p className="font-semibold leading-snug line-clamp-2 group-hover:text-primary mt-0.5">
                     {p.name}
                   </p>
+                  {p.sku && (
+                    <p className="text-xs text-muted-foreground mt-1">SKU: {p.sku}</p>
+                  )}
                   <p className="mt-2 text-lg font-bold text-primary">
                     ৳{p.price.toLocaleString()}
                   </p>

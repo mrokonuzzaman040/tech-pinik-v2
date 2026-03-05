@@ -60,6 +60,18 @@ async function seed() {
       featured: true,
       order: 1,
       createdAt: now,
+      sku: "ELEC-EAR-001",
+      brand: "SoundMax",
+      model: "SM-100",
+      color: "Black",
+      warranty: "1 year",
+      connectivity: "Bluetooth 5.2",
+      compatibility: "iPhone, Android",
+      specifications: [
+        { key: "Driver", value: "10mm" },
+        { key: "Battery", value: "24hr" },
+        { key: "Charging", value: "USB-C" },
+      ],
     },
     {
       _id: new ObjectId(),
@@ -73,6 +85,15 @@ async function seed() {
       featured: true,
       order: 2,
       createdAt: now,
+      sku: "ACC-HUB-002",
+      brand: "TechLink",
+      model: "TL-7in1",
+      warranty: "6 months",
+      connectivity: "USB-C 3.1",
+      specifications: [
+        { key: "Ports", value: "HDMI, 3x USB 3.0, SD/TF" },
+        { key: "Power", value: "100W PD" },
+      ],
     },
     {
       _id: new ObjectId(),
@@ -86,6 +107,9 @@ async function seed() {
       featured: false,
       order: 3,
       createdAt: now,
+      sku: "ACC-STAND-003",
+      brand: "MobilePro",
+      color: "Silver",
     },
     {
       _id: new ObjectId(),
@@ -99,6 +123,9 @@ async function seed() {
       featured: false,
       order: 4,
       createdAt: now,
+      sku: "CAB-USBC-004",
+      brand: "CablePro",
+      connectivity: "USB-C to USB-A",
     },
     {
       _id: new ObjectId(),
@@ -112,6 +139,16 @@ async function seed() {
       featured: true,
       order: 5,
       createdAt: now,
+      sku: "ELEC-SPK-005",
+      brand: "SoundMax",
+      model: "Mini-X",
+      color: "Blue",
+      warranty: "1 year",
+      connectivity: "Bluetooth 5.0",
+      specifications: [
+        { key: "Battery", value: "10hr" },
+        { key: "Driver", value: "5W" },
+      ],
     },
     {
       _id: new ObjectId(),
@@ -125,6 +162,9 @@ async function seed() {
       featured: false,
       order: 6,
       createdAt: now,
+      sku: "ACC-SCR-006",
+      brand: "MobilePro",
+      compatibility: "Universal (6–6.7 inch)",
     },
     {
       _id: new ObjectId(),
@@ -138,6 +178,14 @@ async function seed() {
       featured: true,
       order: 7,
       createdAt: now,
+      sku: "ACC-PWR-007",
+      brand: "TechLink",
+      model: "PB-10K",
+      warranty: "1 year",
+      specifications: [
+        { key: "Capacity", value: "10000mAh" },
+        { key: "Output", value: "18W dual USB" },
+      ],
     },
     {
       _id: new ObjectId(),
@@ -151,6 +199,10 @@ async function seed() {
       featured: false,
       order: 8,
       createdAt: now,
+      sku: "CAB-HDMI-008",
+      brand: "CablePro",
+      connectivity: "HDMI 2.0",
+      specifications: [{ key: "Length", value: "1.5m" }],
     },
   ];
   await db.collection(PRODUCTS_COLLECTION).insertMany(productDocs);

@@ -15,6 +15,11 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await request.json();
+  const specifications = Array.isArray(body.specifications)
+    ? (body.specifications as { key: string; value: string }[]).filter(
+        (s) => s && typeof s.key === "string" && typeof s.value === "string"
+      )
+    : undefined;
   const updated = await updateProduct(id, {
     name: body.name,
     slug: body.slug,
@@ -25,6 +30,14 @@ export async function PATCH(
     stock: body.stock,
     featured: body.featured,
     order: body.order,
+    sku: body.sku != null ? String(body.sku).trim() || undefined : undefined,
+    brand: body.brand != null ? String(body.brand).trim() || undefined : undefined,
+    model: body.model != null ? String(body.model).trim() || undefined : undefined,
+    warranty: body.warranty != null ? String(body.warranty).trim() || undefined : undefined,
+    color: body.color != null ? String(body.color).trim() || undefined : undefined,
+    compatibility: body.compatibility != null ? String(body.compatibility).trim() || undefined : undefined,
+    connectivity: body.connectivity != null ? String(body.connectivity).trim() || undefined : undefined,
+    specifications: specifications?.length ? specifications : undefined,
   });
   if (!updated) {
     return NextResponse.json({ error: "Product not found" }, { status: 404 });

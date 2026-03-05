@@ -20,6 +20,18 @@ export async function POST(request: NextRequest) {
   const stock = Number(body.stock) || 0;
   const featured = Boolean(body.featured);
   const order = typeof body.order === "number" ? body.order : 0;
+  const sku = body.sku != null ? String(body.sku).trim() : undefined;
+  const brand = body.brand != null ? String(body.brand).trim() : undefined;
+  const model = body.model != null ? String(body.model).trim() : undefined;
+  const warranty = body.warranty != null ? String(body.warranty).trim() : undefined;
+  const color = body.color != null ? String(body.color).trim() : undefined;
+  const compatibility = body.compatibility != null ? String(body.compatibility).trim() : undefined;
+  const connectivity = body.connectivity != null ? String(body.connectivity).trim() : undefined;
+  const specifications = Array.isArray(body.specifications)
+    ? (body.specifications as { key: string; value: string }[]).filter(
+        (s) => s && typeof s.key === "string" && typeof s.value === "string"
+      )
+    : undefined;
 
   if (!name || !slug || !categoryId) {
     return NextResponse.json(
@@ -41,6 +53,14 @@ export async function POST(request: NextRequest) {
     stock,
     featured,
     order,
+    sku: sku || undefined,
+    brand: brand || undefined,
+    model: model || undefined,
+    warranty: warranty || undefined,
+    color: color || undefined,
+    compatibility: compatibility || undefined,
+    connectivity: connectivity || undefined,
+    specifications: specifications?.length ? specifications : undefined,
   });
   return NextResponse.json(product);
 }
