@@ -7,7 +7,6 @@ config({ path: ".env.local" });
 config();
 
 import { ObjectId } from "mongodb";
-import { db } from "../lib/db";
 
 const CATEGORIES_COLLECTION = "categories";
 const PRODUCTS_COLLECTION = "products";
@@ -20,6 +19,8 @@ async function seed() {
   if (!process.env.MONGODB_URI) {
     throw new Error("MONGODB_URI is not set. Add it to .env.local and try again.");
   }
+
+  const { db } = await import("../lib/db");
 
   const categories = await db.collection(CATEGORIES_COLLECTION).find({}).toArray();
   const products = await db.collection(PRODUCTS_COLLECTION).find({}).toArray();
