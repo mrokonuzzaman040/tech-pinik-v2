@@ -16,13 +16,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import type { Product, ProductSpec } from "@/lib/collections/products";
-import type { Category } from "@/lib/collections/categories";
+import type { ProductSpec } from "@/lib/collections/products";
 import { Plus, Trash2 } from "lucide-react";
 
+export type CategoryOption = { id: string; name: string };
+
+export type SerializedProduct = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string;
+  price: number;
+  categoryId: string;
+  images: string[];
+  stock: number;
+  featured?: boolean;
+  order?: number;
+  sku?: string;
+  brand?: string;
+  model?: string;
+  warranty?: string;
+  color?: string;
+  compatibility?: string;
+  connectivity?: string;
+  specifications?: ProductSpec[];
+};
+
 type ProductFormProps = {
-  product?: Product;
-  categories: Category[];
+  product?: SerializedProduct;
+  categories: CategoryOption[];
 };
 
 export function ProductForm({ product, categories }: ProductFormProps) {
@@ -89,7 +111,7 @@ export function ProductForm({ product, categories }: ProductFormProps) {
     setLoading(true);
     try {
       const url = product
-        ? `/api/admin/products/${product._id.toString()}`
+        ? `/api/admin/products/${product.id}`
         : "/api/admin/products";
       const method = product ? "PATCH" : "POST";
       const res = await fetch(url, {
@@ -195,11 +217,11 @@ export function ProductForm({ product, categories }: ProductFormProps) {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                {categories.map((c) => (
-                  <SelectItem key={c._id.toString()} value={c._id.toString()}>
-                    {c.name}
-                  </SelectItem>
-                ))}
+              {categories.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
               </SelectContent>
             </Select>
           </div>

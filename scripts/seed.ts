@@ -1,6 +1,10 @@
 /**
- * Seed script: inserts sample categories, products, and sliders.
+ * Seed script: inserts sample categories, products, sliders, and optionally an admin user.
  * Run with: npm run seed (ensure MONGODB_URI is set, e.g. in .env.local)
+ *
+ * Optional .env.local for admin:
+ *   SEED_ADMIN_EMAIL    (default: admin@example.com)
+ *   SEED_ADMIN_PASSWORD (default: admin123456 — change in production)
  */
 import { config } from "dotenv";
 config({ path: ".env.local" });
@@ -11,8 +15,14 @@ import { ObjectId } from "mongodb";
 const CATEGORIES_COLLECTION = "categories";
 const PRODUCTS_COLLECTION = "products";
 const SLIDERS_COLLECTION = "sliders";
+const USER_COLLECTION = "user";
+const ACCOUNT_COLLECTION = "account";
+
+const DEFAULT_ADMIN_EMAIL = "admin@example.com";
+const DEFAULT_ADMIN_PASSWORD = "admin123456";
 
 const PLACEHOLDER_IMAGE = "https://placehold.co/800x800?text=Product";
+const PLACEHOLDER_IMAGE_2 = "https://placehold.co/800x800?text=Product+2";
 const PLACEHOLDER_SLIDER = "https://placehold.co/1200x400?text=Tech+Pinik";
 
 async function seed() {
@@ -27,10 +37,9 @@ async function seed() {
   const sliders = await db.collection(SLIDERS_COLLECTION).find({}).toArray();
 
   if (categories.length > 0 || products.length > 0 || sliders.length > 0) {
-    console.log("Database already has data. Skipping seed (idempotent).");
+    console.log("Database already has data. Skipping categories/products/sliders (idempotent).");
     console.log("  Categories:", categories.length, "| Products:", products.length, "| Sliders:", sliders.length);
-    process.exit(0);
-  }
+  } else {
 
   const now = new Date();
 
@@ -55,7 +64,7 @@ async function seed() {
       description: "High-quality wireless earbuds with noise cancellation and 24hr battery.",
       price: 2499,
       categoryId: categoryIds[0].toString(),
-      images: [PLACEHOLDER_IMAGE],
+      images: [PLACEHOLDER_IMAGE, PLACEHOLDER_IMAGE_2],
       stock: 25,
       featured: true,
       order: 1,
@@ -173,7 +182,7 @@ async function seed() {
       description: "Fast-charge power bank with dual USB output.",
       price: 1599,
       categoryId: categoryIds[2].toString(),
-      images: [PLACEHOLDER_IMAGE],
+      images: [PLACEHOLDER_IMAGE, PLACEHOLDER_IMAGE_2],
       stock: 20,
       featured: true,
       order: 7,
@@ -215,6 +224,50 @@ async function seed() {
   ];
   await db.collection(SLIDERS_COLLECTION).insertMany(sliderDocs);
   console.log("Inserted", sliderDocs.length, "sliders.");
+  }
+
+  // Admin user: create or upgrade to admin so you can log in at /admin/login
+  const adminEmail = (process.env.SEED_ADMIN_EMAIL ?? DEFAULT_ADMIN_EMAIL).toLowerCase().trim();
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD ?? DEFAULT_ADMIN_PASSWORD;
+  if (adminPassword.length < 8) {
+    console.warn("SEED_ADMIN_PASSWORD must be at least 8 characters; skipping admin creation.");
+  } else {
+    const { hashPassword } = await import("better-auth/crypto");
+    const users = db.collection(USER_COLLECTION);
+    const accounts = db.collection(ACCOUNT_COLLECTION);
+    const existing = await users.findOne({ email: adminEmail });
+
+    if (existing) {
+      await users.updateOne(
+        { email: adminEmail },
+        { $set: { role: "admin", updatedAt: new Date() } }
+      );
+      console.log("Admin access: existing user updated to admin —", adminEmail);
+    } else {
+      const userId = new ObjectId();
+      const now = new Date();
+      const hashedPassword = await hashPassword(adminPassword);
+      await users.insertOne({
+        _id: userId,
+        name: "Admin",
+        email: adminEmail,
+        emailVerified: false,
+        image: null,
+        createdAt: now,
+        updatedAt: now,
+        role: "admin",
+      });
+      await accounts.insertOne({
+        userId,
+        accountId: userId.toString(),
+        providerId: "credential",
+        password: hashedPassword,
+        createdAt: now,
+        updatedAt: now,
+      });
+      console.log("Admin user created. Sign in at /admin/login with:", adminEmail);
+    }
+  }
 
   console.log("Seed completed successfully.");
 }

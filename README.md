@@ -17,13 +17,13 @@ Bangladesh-focused e-commerce app built with Next.js (App Router), Better Auth, 
    - `MONGODB_URI`
    - `IMAGEKIT_PUBLIC_KEY`, `IMAGEKIT_PRIVATE_KEY`, `IMAGEKIT_URL_ENDPOINT`
 
-2. Create the first admin user (one-time):
-   - Set `BOOTSTRAP_ADMIN_SECRET`, then `POST /api/bootstrap-admin` with body: `{ "secret": "<same>", "email": "admin@example.com", "password": "your-password" }`
-   - Or call the API and then remove `BOOTSTRAP_ADMIN_SECRET` from env
+2. **Seed data and admin user (recommended):** With `MONGODB_URI` set, run `npm run seed`. This inserts sample categories, products, and sliders (if the DB is empty) and creates an **admin user** you can use to sign in at `/admin/login`.
+   - Default login: **admin@example.com** / **admin123456** (change in production)
+   - Optional in `.env.local`: `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` (min 8 chars) to use different credentials. If the user already exists, their role is set to admin.
 
 3. Run the app and sign in at `/admin/login`.
 
-4. **Seed sample data** (optional): With `MONGODB_URI` set in `.env.local`, run `npm run seed` to insert sample categories, products, and sliders. The script is idempotent: it skips if the database already has data.
+4. **Alternative — bootstrap admin only:** Set `BOOTSTRAP_ADMIN_SECRET`, then `POST /api/bootstrap-admin` with body: `{ "secret": "<same>", "email": "admin@example.com", "password": "your-password" }`. Remove the secret from env after use.
 
 ## Getting Started
 
